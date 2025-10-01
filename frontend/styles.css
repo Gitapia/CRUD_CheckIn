@@ -165,6 +165,25 @@ tr:hover {
     background-color: #f8f9fa;
 }
 
+/* Estilos para campos de fecha y cálculo de noches */
+.form-group input[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.noches-display {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 16px;
+}
+
+.calculo-noches {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
 /* Modal */
 .modal {
     display: none;

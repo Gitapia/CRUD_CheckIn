@@ -1,3 +1,180 @@
+// Agrega estas funciones al principio del script.js
+
+// Calcular noches automáticamente
+function calcularNoches() {
+    const fechaEntrada = document.getElementById('fecha_entrada').value;
+    const fechaSalida = document.getElementById('fecha_salida').value;
+    
+    if (fechaEntrada && fechaSalida) {
+        const entrada = new Date(fechaEntrada);
+        const salida = new Date(fechaSalida);
+        
+        // Validar que la fecha de salida sea posterior a la de entrada
+        if (salida <= entrada) {
+            alert('❌ La fecha de salida debe ser posterior a la fecha de entrada');
+            document.getElementById('fecha_salida').value = '';
+            document.getElementById('noches').value = '0';
+            return;
+        }
+        
+        const diferencia = salida.getTime() - entrada.getTime();
+        const noches = Math.ceil(diferencia / (1000 * 3600 * 24));
+        
+        document.getElementById('noches').value = noches;
+        
+        // Mostrar información adicional
+        mostrarInfoEstadia(noches, entrada, salida);
+    }
+}
+
+// Mostrar información de la estadía
+function mostrarInfoEstadia(noches, entrada, salida) {
+    let infoContainer = document.getElementById('info-estadia');
+    
+    if (!infoContainer) {
+        infoContainer = document.createElement('div');
+        infoContainer.id = 'info-estadia';
+        infoContainer.className = 'calculo-noches';
+        document.getElementById('checkinForm').insertBefore(infoContainer, document.querySelector('.btn-primary'));
+    }
+    
+    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const entradaFormateada = entrada.toLocaleDateString('es-ES', opciones);
+    const salidaFormateada = salida.toLocaleDateString('es-ES', opciones);
+    
+    infoContainer.innerHTML = `
+        <div style="text-align: center; padding: 10px;">
+            <h4 style="margin-bottom: 10px; color: #667eea;">📅 Resumen de Estadía</h4>
+            <p><strong>Entrada:</strong> ${entradaFormateada}</p>
+            <p><strong>Salida:</strong> ${salidaFormateada}</p>
+            <p class="noches-display">🌙 ${noches} noche${noches !== 1 ? 's' : ''}</p>
+        </div>
+    `;
+}
+
+// Establecer fechas mínimas (hoy para entrada, mañana para salida)
+function configurarFechas() {
+    const hoy = new Date();
+    const manana = new Date();
+    manana.setDate(hoy.getDate() + 1);
+    
+    // Formatear a YYYY-MM-DD
+    const hoyFormateado = hoy.toISOString().split('T')[0];
+    const mananaFormateado = manana.toISOString().split('T')[0];
+    
+    document.getElementById('fecha_entrada').min = hoyFormateado;
+    document.getElementById('fecha_salida').min = mananaFormateado;
+    
+    // Establecer valores por defecto
+    document.getElementById('fecha_entrada').value = hoyFormateado;
+    document.getElementById('fecha_salida').value = mananaFormateado;
+    
+    // Calcular noches iniciales
+    calcularNoches();
+}
+
+// Actualiza el formulario de check-in
+document.getElementById('checkinForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const huespedData = {
+        nombre: document.getElementById('nombre').value,
+        email: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value,
+        documento_identidad: document.getElementById('documento').value,
+        fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+        nacionalidad: document.getElementById('nacionalidad').value
+    };
+    
+    const registroData = {
+        numero_habitacion: document.getElementById('numero_habitacion').value,
+        tipo_habitacion: document.getElementById('tipo_habitacion').value,
+        fecha_checkin: document.getElementById('fecha_entrada').value,
+        fecha_checkout_estimada: document.getElementById('fecha_salida').value,
+        noches_estimadas: document.getElementById('noches').value,
+        observaciones: document.getElementById('observaciones').value
+    };
+    
+    try {
+        console.log('📝 Creando huésped...', huespedData);
+        
+        // Primero crear el huésped
+        const huespedResponse = await fetch(`${API_BASE_URL}/huespedes`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(huespedData)
+        });
+        
+        if (!huespedResponse.ok) {
+            const errorData = await huespedResponse.json();
+            throw new Error(errorData.error || 'Error creando huésped');
+        }
+        
+        const huespedResult = await huespedResponse.json();
+        console.log('✅ Huésped creado:', huespedResult);
+        
+        // Luego crear el registro con el ID del huésped
+        registroData.huesped_id = huespedResult.id;
+        console.log('📝 Creando registro...', registroData);
+        
+        const registroResponse = await fetch(`${API_BASE_URL}/registros`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(registroData)
+        });
+        
+        if (!registroResponse.ok) {
+            const errorData = await registroResponse.json();
+            throw new Error(errorData.error || 'Error creando registro');
+        }
+        
+        const registroResult = await registroResponse.json();
+        console.log('✅ Registro creado:', registroResult);
+        
+        alert(`✅ Check-In realizado exitosamente!\n\nEstadía: ${registroData.noches_estimadas} noche(s)\nDel ${registroData.fecha_checkin} al ${registroData.fecha_checkout_estimada}`);
+        document.getElementById('checkinForm').reset();
+        configurarFechas(); // Resetear fechas
+        
+        openTab('registros');
+        
+    } catch (error) {
+        console.error('❌ Error en check-in:', error);
+        alert(`❌ Error al realizar el check-in: ${error.message}`);
+    }
+});
+
+// Agrega event listeners para las fechas
+document.addEventListener('DOMContentLoaded', function() {
+    configurarFechas();
+    
+    document.getElementById('fecha_entrada').addEventListener('change', function() {
+        const fechaEntrada = this.value;
+        const fechaSalida = document.getElementById('fecha_salida');
+        
+        if (fechaEntrada) {
+            const minSalida = new Date(fechaEntrada);
+            minSalida.setDate(minSalida.getDate() + 1);
+            fechaSalida.min = minSalida.toISOString().split('T')[0];
+            
+            // Si la fecha de salida actual es anterior a la nueva mínima, resetear
+            if (fechaSalida.value && new Date(fechaSalida.value) < minSalida) {
+                fechaSalida.value = minSalida.toISOString().split('T')[0];
+            }
+        }
+        
+        calcularNoches();
+    });
+    
+    document.getElementById('fecha_salida').addEventListener('change', calcularNoches);
+});
+
+
 let currentCheckoutId = null;
 const API_BASE_URL = 'http://localhost:3000/api'; // Cambia esto si tu servidor está en otro puerto
 
@@ -160,15 +337,16 @@ async function loadRegistrosActivos() {
             const dias = Math.floor((new Date() - checkinDate) / (1000 * 60 * 60 * 24));
             
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${registro.nombre}</td>
-                <td>${registro.numero_habitacion}</td>
-                <td>${registro.tipo_habitacion}</td>
-                <td>${formatDate(registro.fecha_checkin)}</td>
-                <td>${dias} días</td>
-                <td>
-                    <button class="btn-primary" onclick="openCheckoutModal(${registro.id})">Check-Out</button>
-                </td>
+           tr.innerHTML = `
+    <td>${registro.nombre}</td>
+    <td>${registro.numero_habitacion}</td>
+    <td>${registro.tipo_habitacion}</td>
+    <td>${formatDate(registro.fecha_checkin)}</td>
+    <td>${formatDate(registro.fecha_checkout_estimada)}</td>
+    <td>${registro.noches || calcularNochesDesdeFechas(registro.fecha_checkin, registro.fecha_checkout_estimada)} noches</td>
+    <td>
+        <button class="btn-primary" onclick="openCheckoutModal(${registro.id})">Check-Out</button>
+    </td>
             `;
             tbody.appendChild(tr);
         });
@@ -176,6 +354,14 @@ async function loadRegistrosActivos() {
         console.error('❌ Error cargando registros activos:', error);
         alert('Error cargando registros activos');
     }
+}
+
+// Agrega esta función auxiliar
+function calcularNochesDesdeFechas(fechaInicio, fechaFin) {
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+    const diferencia = fin.getTime() - inicio.getTime();
+    return Math.ceil(diferencia / (1000 * 3600 * 24));
 }
 
 // Cargar historial - CORREGIDO

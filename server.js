@@ -110,41 +110,63 @@ app.get('/api/registros/historial', async (req, res) => {
     }
 });
 
-// Crear nuevo registro (check-in) - CON MYSQL
+// Crear nuevo registro (check-in) - CON FECHAS
 app.post('/api/registros', async (req, res) => {
     try {
-        const { huesped_id, numero_habitacion, tipo_habitacion, fecha_checkin, observaciones } = req.body;
+        const { huesped_id, numero_habitacion, tipo_habitacion, fecha_checkin, fecha_checkout_estimada, noches_estimadas, observaciones } = req.body;
         
         // Validaciones
-        if (!huesped_id || !numero_habitacion || !tipo_habitacion) {
+        if (!huesped_id || !numero_habitacion || !tipo_habitacion || !fecha_checkin || !fecha_checkout_estimada) {
             return res.status(400).json({ 
-                error: 'Huésped, número de habitación y tipo son obligatorios' 
+                error: 'Todos los campos son obligatorios' 
             });
         }
 
-        // Verificar que la habitación no esté ocupada
+        // Validar que la fecha de salida sea posterior a la de entrada
+        const fechaEntrada = new Date(fecha_checkin);
+        const fechaSalida = new Date(fecha_checkout_estimada);
+        
+        if (fechaSalida <= fechaEntrada) {
+            return res.status(400).json({ 
+                error: 'La fecha de salida debe ser posterior a la fecha de entrada' 
+            });
+        }
+
+        // Verificar que la habitación no esté ocupada en esas fechas
         const [habitacionOcupada] = await pool.execute(
-            'SELECT id FROM registros WHERE numero_habitacion = ? AND estado = "activo"',
-            [numero_habitacion]
+            `SELECT id FROM registros 
+             WHERE numero_habitacion = ? 
+             AND estado = 'activo'
+             AND (
+                 (fecha_checkin BETWEEN ? AND ?) 
+                 OR (fecha_checkout_estimada BETWEEN ? AND ?)
+                 OR (? BETWEEN fecha_checkin AND fecha_checkout_estimada)
+             )`,
+            [numero_habitacion, fecha_checkin, fecha_checkout_estimada, fecha_checkin, fecha_checkout_estimada, fecha_checkin]
         );
 
         if (habitacionOcupada.length > 0) {
             return res.status(400).json({ 
-                error: 'La habitación ya está ocupada' 
+                error: 'La habitación ya está reservada en esas fechas' 
             });
         }
 
         const [result] = await pool.execute(
-            `INSERT INTO registros (huesped_id, numero_habitacion, tipo_habitacion, fecha_checkin, observaciones) 
-             VALUES (?, ?, ?, ?, ?)`,
-            [huesped_id, numero_habitacion, tipo_habitacion, fecha_checkin, observaciones]
+            `INSERT INTO registros (huesped_id, numero_habitacion, tipo_habitacion, fecha_checkin, fecha_checkout_estimada, observaciones) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [huesped_id, numero_habitacion, tipo_habitacion, fecha_checkin, fecha_checkout_estimada, observaciones]
         );
 
         console.log('✅ Registro creado en BD. ID:', result.insertId);
         res.status(201).json({ 
             id: result.insertId, 
             success: true,
-            message: 'Check-in realizado exitosamente'
+            message: 'Check-in realizado exitosamente',
+            estadia: {
+                noches: noches_estimadas,
+                entrada: fecha_checkin,
+                salida: fecha_checkout_estimada
+            }
         });
     } catch (error) {
         console.error('Error creando registro:', error);
