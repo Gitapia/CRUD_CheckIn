@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Hotel - Check In/Out</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏨 Sistema de Gestión Hotelera</h1>
+            <nav>
+                    <button class="tab-btn active" onclick="openTab('checkin', event)">Check-In</button>
+                    <button class="tab-btn" onclick="openTab('huespedes', event)">Huéspedes</button>
+                    <button class="tab-btn" onclick="openTab('registros', event)">Registros Activos</button>
+                    <button class="tab-btn" onclick="openTab('historial', event)">Historial</button>
+            </nav>
+        </header>
+
+        <!-- Tab Check-In -->
+        <div id="checkin" class="tab-content active">
+            <h2>Nuevo Check-In</h2>
+            <form id="checkinForm" class="form-grid">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo:</label>
+                    <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" required>
+                </div>
+                <div class="form-group">
+                    <label for="documento">Documento de identidad:</label>
+                    <input type="text" id="documento" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+                    <input type="date" id="fecha_nacimiento">
+                </div>
+                <div class="form-group">
+                    <label for="nacionalidad">Nacionalidad:</label>
+                    <input type="text" id="nacionalidad">
+                </div>
+                <div class="form-group">
+                    <label for="numero_habitacion">Número de habitación:</label>
+                    <input type="text" id="numero_habitacion" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipo_habitacion">Tipo de habitación:</label>
+                    <select id="tipo_habitacion" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="individual">Individual</option>
+                        <option value="doble">Doble</option>
+                        <option value="suite">Suite</option>
+                        <option value="familiar">Familiar</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label for="observaciones">Observaciones:</label>
+                    <textarea id="observaciones" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Realizar Check-In</button>
+            </form>
+        </div>
+
+        <!-- Tab Huéspedes -->
+        <div id="huespedes" class="tab-content">
+            <h2>Gestión de Huéspedes</h2>
+            <div class="table-container">
+                <table id="huespedesTable">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Documento</th>
+                            <th>Nacionalidad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="huespedesBody">
+                        <!-- Los datos se cargan con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab Registros Activos -->
+        <div id="registros" class="tab-content">
+            <h2>Registros Activos</h2>
+            <div class="table-container">
+                <table id="registrosTable">
+                    <thead>
+                        <tr>
+                            <th>Huésped</th>
+                            <th>Habitación</th>
+                            <th>Tipo</th>
+                            <th>Check-In</th>
+                            <th>Días</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registrosBody">
+                        <!-- Los datos se cargan con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab Historial -->
+        <div id="historial" class="tab-content">
+            <h2>Historial de Estancias</h2>
+            <div class="table-container">
+                <table id="historialTable">
+                    <thead>
+                        <tr>
+                            <th>Huésped</th>
+                            <th>Habitación</th>
+                            <th>Check-In</th>
+                            <th>Check-Out</th>
+                            <th>Total Pagado</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historialBody">
+                        <!-- Los datos se cargan con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Check-Out -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Realizar Check-Out</h3>
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label for="totalPago">Total a pagar ($):</label>
+                    <input type="number" id="totalPago" step="0.01" required>
+                </div>
+                <button type="submit" class="btn-primary">Confirmar Check-Out</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
