@@ -19,70 +19,77 @@
         </header>
 
         <!-- Tab Check-In -->
-        <div id="checkin" class="tab-content active">
-            <h2>Nuevo Check-In</h2>
-            <form id="checkinForm" class="form-grid">
-                <div class="form-group">
-                    <label for="nombre">Nombre completo:</label>
-                    <input type="text" id="nombre" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="telefono">Teléfono:</label>
-                    <input type="tel" id="telefono" required>
-                </div>
-                <div class="form-group">
-                    <label for="documento">Documento de identidad:</label>
-                    <input type="text" id="documento" required>
-                </div>
-                <div class="form-group">
-                    <label for="fecha_nacimiento">Fecha de nacimiento:</label>
-                    <input type="date" id="fecha_nacimiento">
-                </div>
-                <div class="form-group">
-                    <label for="nacionalidad">Nacionalidad:</label>
-                    <input type="text" id="nacionalidad">
-                </div>
-                <div class="form-group">
-                    <label for="numero_habitacion">Número de habitación:</label>
-                    <input type="text" id="numero_habitacion" required>
-                </div>
-                <div class="form-group">
-                    <label for="tipo_habitacion">Tipo de habitación:</label>
-                    <select id="tipo_habitacion" required>
-                        <option value="">Seleccionar...</option>
-                        <option value="individual">Individual</option>
-                        <option value="doble">Doble</option>
-                        <option value="suite">Suite</option>
-                        <option value="familiar">Familiar</option>
-                    </select>
-                    <!-- Después del campo tipo_habitacion -->
-<div class="form-group">
-    <label for="fecha_entrada">Fecha de Entrada:</label>
-    <input type="date" id="fecha_entrada" required>
-</div>
-
-<div class="form-group">
-    <label for="fecha_salida">Fecha de Salida Estimada:</label>
-    <input type="date" id="fecha_salida" required>
-</div>
-
-<div class="form-group">
-    <label for="noches">Noches de estadía:</label>
-    <input type="number" id="noches" readonly>
-</div>
-                    
-                </div>
-                <div class="form-group full-width">
-                    <label for="observaciones">Observaciones:</label>
-                    <textarea id="observaciones" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn-primary">Realizar Check-In</button>
-            </form>
-        </div>
+        <!-- En el formulario de check-in, reorganiza los campos -->
+<form id="checkinForm" class="form-grid">
+    <!-- Campos personales del huésped -->
+    <div class="form-group">
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+    </div>
+    <div class="form-group">
+        <label for="telefono">Teléfono:</label>
+        <input type="tel" id="telefono" required>
+    </div>
+    <div class="form-group">
+        <label for="documento">Documento de identidad:</label>
+        <input type="text" id="documento" required>
+    </div>
+    <div class="form-group">
+        <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+        <input type="date" id="fecha_nacimiento">
+    </div>
+    <div class="form-group">
+        <label for="nacionalidad">Nacionalidad:</label>
+        <input type="text" id="nacionalidad">
+    </div>
+    
+    <!-- Información de la habitación -->
+    <div class="form-group">
+        <label for="numero_habitacion">Número de habitación:</label>
+        <input type="text" id="numero_habitacion" required>
+    </div>
+    <div class="form-group">
+        <label for="tipo_habitacion">Tipo de habitación:</label>
+        <select id="tipo_habitacion" required>
+            <option value="">Seleccionar...</option>
+            <option value="individual">Individual</option>
+            <option value="doble">Doble</option>
+            <option value="suite">Suite</option>
+            <option value="familiar">Familiar</option>
+        </select>
+    </div>
+    
+    <!-- Fechas de estadía -->
+    <div class="form-group">
+        <label for="fecha_entrada">Fecha de Entrada:</label>
+        <input type="date" id="fecha_entrada" required>
+    </div>
+    <div class="form-group">
+        <label for="fecha_salida">Fecha de Salida Estimada:</label>
+        <input type="date" id="fecha_salida" required>
+    </div>
+    <div class="form-group">
+        <label for="noches">Noches de estadía:</label>
+        <input type="number" id="noches" readonly>
+    </div>
+    
+    <!-- Resumen de Estadía (se insertará aquí dinámicamente) -->
+    <div id="info-estadia-container" class="form-group full-width">
+        <!-- El resumen se insertará aquí automáticamente -->
+    </div>
+    
+    <!-- Observaciones -->
+    <div class="form-group full-width">
+        <label for="observaciones">Observaciones:</label>
+        <textarea id="observaciones" rows="3"></textarea>
+    </div>
+    
+    <button type="submit" class="btn-primary">Realizar Check-In</button>
+</form>
 
         <!-- Tab Huéspedes -->
         <div id="huespedes" class="tab-content">

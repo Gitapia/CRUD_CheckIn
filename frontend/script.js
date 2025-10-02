@@ -52,7 +52,7 @@ function mostrarInfoEstadia(noches, entrada, salida) {
     `;
 }
 
-// Establecer fechas mínimas (hoy para entrada, mañana para salida)
+/// Establecer fechas mínimas (hoy para entrada, mañana para salida)
 function configurarFechas() {
     const hoy = new Date();
     const manana = new Date();
@@ -69,7 +69,7 @@ function configurarFechas() {
     document.getElementById('fecha_entrada').value = hoyFormateado;
     document.getElementById('fecha_salida').value = mananaFormateado;
     
-    // Calcular noches iniciales
+    // Calcular noches iniciales y mostrar resumen
     calcularNoches();
 }
 
@@ -138,10 +138,10 @@ document.getElementById('checkinForm').addEventListener('submit', async (e) => {
         console.log('✅ Registro creado:', registroResult);
         
         alert(`✅ Check-In realizado exitosamente!\n\nEstadía: ${registroData.noches_estimadas} noche(s)\nDel ${registroData.fecha_checkin} al ${registroData.fecha_checkout_estimada}`);
-        document.getElementById('checkinForm').reset();
-        configurarFechas(); // Resetear fechas
-        
-        openTab('registros');
+document.getElementById('checkinForm').reset();
+configurarFechas(); // Esto reseteará las fechas y mostrará el resumen por defecto
+
+openTab('registros');
         
     } catch (error) {
         console.error('❌ Error en check-in:', error);
